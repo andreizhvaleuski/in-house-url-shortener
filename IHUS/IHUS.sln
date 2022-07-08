@@ -3,7 +3,31 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IHUS.WebAPI", "IHUS.WebAPI\IHUS.WebAPI.csproj", "{AD09DDB6-129A-4A88-91A8-4E902B937DE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IHUS.Domain", "IHUS.Domain\IHUS.Domain.csproj", "{54D436DB-DA73-4921-B687-B95D6604F8CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IHUS.Database", "IHUS.Infrastructure\IHUS.Database.csproj", "{BF6148D5-BF8E-4FC0-953E-16B3A6C6E763}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD09DDB6-129A-4A88-91A8-4E902B937DE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD09DDB6-129A-4A88-91A8-4E902B937DE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD09DDB6-129A-4A88-91A8-4E902B937DE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD09DDB6-129A-4A88-91A8-4E902B937DE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54D436DB-DA73-4921-B687-B95D6604F8CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54D436DB-DA73-4921-B687-B95D6604F8CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54D436DB-DA73-4921-B687-B95D6604F8CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54D436DB-DA73-4921-B687-B95D6604F8CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF6148D5-BF8E-4FC0-953E-16B3A6C6E763}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF6148D5-BF8E-4FC0-953E-16B3A6C6E763}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF6148D5-BF8E-4FC0-953E-16B3A6C6E763}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF6148D5-BF8E-4FC0-953E-16B3A6C6E763}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
