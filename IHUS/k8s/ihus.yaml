@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: in-house-url-shortener-rw
+spec:
+  selector:
+    matchLabels:
+      app: in-house-url-shortener
+      mode: read-write
+  minReadySeconds: 60
+  template:
+    metadata:
+      labels:
+        app: in-house-url-shortener
+        mode: read-write
+    spec:
+      containers:
+        - name: in-house-url-shortener
+          image: ihus:latest
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+          env:
+            - name: "ConnectionStrings__Default"
+              value: "Host=172.17.0.2;Username=postgres;Password=postgres;Database=IHUS"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: in-house-url-shortener-rw
+spec:
+  ports:
+    - port: 5000
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: in-house-url-shortener
+    mode: read-write
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: in-house-url-shortener-ro-1
+spec:
+  selector:
+    matchLabels:
+      app: in-house-url-shortener
+      mode: read-only
+      instance: "1"
+  minReadySeconds: 60
+  template:
+    metadata:
+      labels:
+        app: in-house-url-shortener
+        mode: read-only
+        instance: "1"
+    spec:
+      containers:
+        - name: in-house-url-shortener-ro
+          image: ihus:latest
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+          env:
+            - name: "ConnectionStrings__Default"
+              value: "Host=172.17.0.2;Username=postgres;Password=postgres;Database=IHUS"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: in-house-url-shortener-ro-2
+spec:
+  selector:
+    matchLabels:
+      app: in-house-url-shortener
+      mode: read-only
+      instance: "2"
+  minReadySeconds: 60
+  template:
+    metadata:
+      labels:
+        app: in-house-url-shortener
+        mode: read-only
+        instance: "2"
+    spec:
+      containers:
+        - name: in-house-url-shortener
+          image: ihus:latest
+          imagePullPolicy: Never
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+          env:
+            - name: "ConnectionStrings__Default"
+              value: "Host=172.17.0.2;Username=postgres;Password=postgres;Database=IHUS"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: in-house-url-shortener-ro
+spec:
+  ports:
+    - port: 5000
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: in-house-url-shortener
+    mode: read-only

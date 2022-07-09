@@ -1,0 +1,23 @@
+apiVersion: k8s.nginx.org/v1
+kind: VirtualServer
+metadata:
+  name: ihus
+spec:
+  host: ihus.com
+  upstreams:
+  - name: ro
+    service: in-house-url-shortener-ro
+    port: 5000
+  - name: rw
+    service: in-house-url-shortener-rw
+    port: 5000
+  routes:
+  - path: /api
+    matches:
+    - conditions:
+      - variable: $request_method
+        value: GET
+      action:
+        pass: ro
+    action:
+      pass: rw
