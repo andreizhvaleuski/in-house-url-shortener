@@ -353,3 +353,7 @@ MigrationBackup/
 
 # Rider directory
 .idea/
+
+# Deployment specific directories
+Deployment/**/data/
+Deployment/**/tmp/

@@ -1,0 +1,64 @@
+version: "3"
+
+name: ihus-pg
+
+services:
+  pg-master:
+    image: postgres:14.4
+    container_name: pg-master
+    restart: always
+    user: postgres
+    volumes:
+      - ./data/pg-master:/var/lib/postgresql/data
+      - ./tmp/pg-slaves:/tmp/pg-slaves
+    ports:
+      - "5010:5432"
+    environment:
+      POSTGRES_USER: postges
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  pg-slave-1:
+    image: postgres:14.4
+    container_name: pg-slave-1
+    restart: always
+    user: postgres
+    volumes:
+      - ./data/pg-slave-1:/var/lib/postgresql/data
+    ports:
+      - "5021:5432"
+    environment:
+      POSTGRES_USER: postges
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      pg-master:
+        condition: service_healthy
+
+  pg-slave-2:
+    image: postgres:14.4
+    container_name: pg-slave-2
+    restart: always
+    user: postgres
+    volumes:
+      - ./data/pg-slave-2:/var/lib/postgresql/data
+    ports:
+      - "5022:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      pg-master:
+        condition: service_healthy
