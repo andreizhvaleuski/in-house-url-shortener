@@ -26,7 +26,10 @@ spec:
             - containerPort: 80
           env:
             - name: "ConnectionStrings__Default"
-              value: "Host=172.17.0.2;Username=postgres;Password=postgres;Database=IHUS"
+              valueFrom:
+                secretKeyRef:
+                  name: ihus-secrets
+                  key: pg-master-connection-string
 ---
 apiVersion: v1
 kind: Service
@@ -72,7 +75,10 @@ spec:
             - containerPort: 80
           env:
             - name: "ConnectionStrings__Default"
-              value: "Host=172.17.0.2;Username=postgres;Password=postgres;Database=IHUS"
+              valueFrom:
+                secretKeyRef:
+                  name: ihus-secrets
+                  key: pg-slave-1-connection-string
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -104,7 +110,10 @@ spec:
             - containerPort: 80
           env:
             - name: "ConnectionStrings__Default"
-              value: "Host=172.17.0.2;Username=postgres;Password=postgres;Database=IHUS"
+              valueFrom:
+                secretKeyRef:
+                  name: ihus-secrets
+                  key: pg-slave-2-connection-string
 ---
 apiVersion: v1
 kind: Service
