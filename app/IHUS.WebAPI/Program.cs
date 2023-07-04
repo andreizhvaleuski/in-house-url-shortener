@@ -4,6 +4,7 @@ using IHUS.Domain.Services.Generation.Implementations;
 using IHUS.Domain.Services.Generation.Interfaces;
 using IHUS.Domain.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Stashbox;
 
 namespace IHUS.WebAPI
 {
@@ -46,6 +47,12 @@ namespace IHUS.WebAPI
                 .AddSingleton<ISaltProvider, RngSaltProvider>()
                 .AddScoped<IShortenedUrlRepository, ShortenedUrlRepository>()
                 .AddScoped<IShortenedUrlGenerator, HashBasedUrlShortener>();
+
+            builder.Host.UseStashbox()
+                .ConfigureContainer<IStashboxContainer>(container =>
+                {
+                    container.Validate();
+                });
 
             return builder.Build();
         }
