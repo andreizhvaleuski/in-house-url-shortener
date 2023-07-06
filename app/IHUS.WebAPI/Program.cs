@@ -4,7 +4,6 @@ using IHUS.Domain.Services.Generation.Implementations;
 using IHUS.Domain.Services.Generation.Interfaces;
 using IHUS.Domain.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Stashbox;
 
 namespace IHUS.WebAPI
 {
@@ -34,9 +33,12 @@ namespace IHUS.WebAPI
             var builder = WebApplication.CreateBuilder(args);
 
             builder
-                .Services.AddControllers()
-                .Services.AddEndpointsApiExplorer()
-                .AddSwaggerGen();
+                .Services
+                    .AddControllers()
+                    .AddControllersAsServices()
+                .Services
+                    .AddEndpointsApiExplorer()
+                    .AddSwaggerGen();
 
             builder
                 .Services.AddDbContextPool<IHUSDbContext>(options =>
@@ -48,11 +50,14 @@ namespace IHUS.WebAPI
                 .AddScoped<IShortenedUrlRepository, ShortenedUrlRepository>()
                 .AddScoped<IShortenedUrlGenerator, HashBasedUrlShortener>();
 
-            builder.Host.UseStashbox()
-                .ConfigureContainer<IStashboxContainer>(container =>
+            builder.Host.UseStashbox(container =>
+            {
+                container.Configure(configurator =>
                 {
-                    container.Validate();
+                    configurator.WithLifetimeValidation();
+                    configurator.WithDisposableTransientTracking();
                 });
+            });
 
             return builder.Build();
         }
