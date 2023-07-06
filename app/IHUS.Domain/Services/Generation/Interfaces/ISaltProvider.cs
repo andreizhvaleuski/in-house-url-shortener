@@ -1,7 +1,6 @@
-﻿namespace IHUS.Domain.Services.Generation.Interfaces
+﻿namespace IHUS.Domain.Services.Generation.Interfaces;
+
+public interface ISaltProvider
 {
-    public interface ISaltProvider
-    {
-        public byte[] GetSalt();
-    }
+    public byte[] GetSalt();
 }

@@ -1,7 +1,6 @@
-﻿namespace IHUS.Domain.Services.Generation.Interfaces
+﻿namespace IHUS.Domain.Services.Generation.Interfaces;
+
+public interface IHashProvider
 {
-    public interface IHashProvider
-    {
-        public byte[] CalculateHash(byte[] input);
-    }
+    public byte[] CalculateHash(byte[] input);
 }

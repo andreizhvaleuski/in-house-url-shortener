@@ -1,15 +1,12 @@
 ﻿using IHUS.Domain.Services.Generation.Interfaces;
 using System.Security.Cryptography;
 
-namespace IHUS.Domain.Services.Generation.Implementations
-{
-    public class Sha256HashProvider : IHashProvider
-    {
-        public byte[] CalculateHash(byte[] input)
-        {
-            using var sha256 = SHA256.Create();
+namespace IHUS.Domain.Services.Generation.Implementations;
 
-            return sha256.ComputeHash(input);
-        }
+public class Sha256HashProvider : IHashProvider
+{
+    public byte[] CalculateHash(byte[] input)
+    {
+        return SHA256.HashData(input);
     }
 }

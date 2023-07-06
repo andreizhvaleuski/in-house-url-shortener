@@ -4,52 +4,51 @@ using IHUS.Domain.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
-namespace IHUS.Database.Repositories
+namespace IHUS.Database.Repositories;
+
+public class ShortenedUrlRepository : IShortenedUrlRepository
 {
-    public class ShortenedUrlRepository : IShortenedUrlRepository
+    private const string UniqueViolation = "23505";
+
+    private readonly IHUSDbContext _dbContext;
+
+    public ShortenedUrlRepository(IHUSDbContext context)
     {
-        private const string UniqueViolation = "23505";
+        _dbContext = context ?? throw new ArgumentNullException(nameof(context));
+    }
 
-        private readonly IHUSDbContext _dbContext;
-
-        public ShortenedUrlRepository(IHUSDbContext context)
+    public async Task CreateAsync(ShortenedUrl shortenedUrl)
+    {
+        try
         {
-            _dbContext = context ?? throw new ArgumentNullException(nameof(context));
-        }
-
-        public async Task CreateAsync(ShortenedUrl shortenedUrl)
-        {
-            try
+            var entity = new ShortenedUrlEntity
             {
-                var entity = new ShortenedUrlEntity
-                {
-                    ShortUrlKey = shortenedUrl.UrlKey,
-                    ActualUrl = shortenedUrl.ActualUrl
-                };
+                ShortUrlKey = shortenedUrl.UrlKey,
+                ActualUrl = shortenedUrl.ActualUrl
+            };
 
-                _dbContext.ShortenedUrls.Add(entity);
+            _dbContext.ShortenedUrls.Add(entity);
 
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                if (ex.InnerException is PostgresException pex
-                    && pex.SqlState == UniqueViolation)
-                {
-                    throw new DuplicateShortUrlKeyException(shortenedUrl.UrlKey, ex);
-                }
-
-                throw;
-            }
+            await _dbContext.SaveChangesAsync();
         }
-
-        public async Task<ShortenedUrl?> GetAsync(string shortenedUrlKey)
+        catch (DbUpdateException ex)
         {
-            var entity = await _dbContext.ShortenedUrls.FindAsync(shortenedUrlKey);
+            if (ex.InnerException is PostgresException pex
+                && pex.SqlState == UniqueViolation)
+            {
+                throw new DuplicateShortUrlKeyException(shortenedUrl.UrlKey, ex);
+            }
 
-            return entity is not null
-                ? new ShortenedUrl(entity.ShortUrlKey, entity.ActualUrl)
-                : null;
+            throw;
         }
+    }
+
+    public async Task<ShortenedUrl?> GetAsync(string shortenedUrlKey)
+    {
+        var entity = await _dbContext.ShortenedUrls.FindAsync(shortenedUrlKey);
+
+        return entity is not null
+            ? new ShortenedUrl(entity.ShortUrlKey, entity.ActualUrl)
+            : null;
     }
 }
