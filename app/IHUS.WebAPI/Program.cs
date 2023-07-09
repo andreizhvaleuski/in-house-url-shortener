@@ -1,9 +1,11 @@
+using System.Globalization;
 using IHUS.Database;
 using IHUS.Database.Repositories;
 using IHUS.Domain.Services.Generation.Implementations;
 using IHUS.Domain.Services.Generation.Interfaces;
 using IHUS.Domain.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace IHUS.WebAPI;
 
@@ -11,12 +13,29 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        var app = BuildApp(args);
+        Log.Logger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+            .WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture)
+            .CreateBootstrapLogger();
 
-        ConfigureMiddlewares(app);
-        await Initialize(app);
+        try
+        {
+            var app = BuildApp(args);
 
-        await app.RunAsync();
+            ConfigureMiddlewares(app);
+            await Initialize(app);
+
+            await app.RunAsync();
+        }
+        catch (Exception exception)
+        {
+            Log.Fatal(exception, "Application terminated unexpectedly");
+        }
+        finally
+        {
+            await Log.CloseAndFlushAsync();
+        }
     }
 
     private static async Task Initialize(WebApplication app)
@@ -50,6 +69,13 @@ public class Program
             .AddScoped<IShortenedUrlRepository, ShortenedUrlRepository>()
             .AddScoped<IShortenedUrlGenerator, HashBasedUrlShortener>();
 
+        builder.Host.UseSerilog((context, services, configuration) => configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .ReadFrom.Services(services)
+            .Enrich.FromLogContext()
+            .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+            .WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture));
+
         builder.Host.UseStashbox(container =>
         {
             container.Configure(configurator =>
@@ -66,6 +92,7 @@ public class Program
     {
         app.UseSwagger();
         app.UseSwaggerUI();
+        app.UseSerilogRequestLogging();
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();
