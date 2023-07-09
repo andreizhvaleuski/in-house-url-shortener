@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IHUS.Database.Migrator": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Host=localhost;Username=habrpguser;Password=pgpwd4habr;Database=IHUS\""
+    }
+  }
+}

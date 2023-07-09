@@ -42,9 +42,9 @@ public class Program
     {
         using var scope = app.Services.CreateScope();
 
-        var dbContext = scope.ServiceProvider.GetRequiredService<IHUSDbContext>();
+        //var dbContext = scope.ServiceProvider.GetRequiredService<IHUSDbContext>();
 
-        await dbContext.Database.MigrateAsync();
+        //await dbContext.Database.MigrateAsync();
     }
 
     private static WebApplication BuildApp(string[] args)
@@ -59,9 +59,9 @@ public class Program
                 .AddEndpointsApiExplorer()
                 .AddSwaggerGen();
 
-        builder
-            .Services.AddDbContextPool<IHUSDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+        //builder
+        //    .Services.AddDbContextPool<IHUSDbContext>(options =>
+        //        options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
         builder.Services
             .AddSingleton<IHashProvider, Sha256HashProvider>()

@@ -1,29 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using FluentMigrator;
+using IHUS.Domain.Constants;
 
-#nullable disable
-
-namespace IHUS.Database.Migrations;
-
-public partial class Initial : Migration
+[Migration(20220708110948)]
+public sealed class Initial : Migration
 {
-    protected override void Up(MigrationBuilder migrationBuilder)
+    public override void Up()
     {
-        migrationBuilder.CreateTable(
-            name: "ShortenedUrls",
-            columns: table => new
-            {
-                ShortUrlKey = table.Column<string>(type: "character(6)", nullable: false),
-                ActualUrl = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false)
-            },
-            constraints: table =>
-            {
-                table.PrimaryKey("PK_ShortenedUrls", x => x.ShortUrlKey);
-            });
+        Create.Table("ShortenedUrls")
+            .WithColumn("ShortUrlKey")
+                .AsFixedLengthString(Limits.ShortUrlKeyLength)
+                .PrimaryKey()
+            .WithColumn("ActualUrl")
+                .AsString(Limits.ActualUrlMaxLength)
+                .NotNullable();
     }
 
-    protected override void Down(MigrationBuilder migrationBuilder)
+    public override void Down()
     {
-        migrationBuilder.DropTable(
-            name: "ShortenedUrls");
+        Delete.Table("ShortenedUrls");
     }
 }
