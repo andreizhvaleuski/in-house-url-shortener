@@ -1,8 +1,8 @@
-﻿using IHUS.Database.Entities;
+﻿using Dapper;
+using IHUS.Database.Entities;
 using IHUS.Domain.Entities;
 using IHUS.Domain.Services.Repositories;
-//using Microsoft.EntityFrameworkCore;
-//using Npgsql;
+using Npgsql;
 
 namespace IHUS.Database.Repositories;
 
@@ -10,47 +10,39 @@ public class ShortenedUrlRepository : IShortenedUrlRepository
 {
     private const string UniqueViolation = "23505";
 
-    //private readonly IHUSDbContext _dbContext;
+    private readonly NpgsqlConnection _npgsqlConnection;
 
-    //public ShortenedUrlRepository(IHUSDbContext context)
-    //{
-    //    _dbContext = context ?? throw new ArgumentNullException(nameof(context));
-    //}
+    public ShortenedUrlRepository(NpgsqlConnection npgsqlConnection)
+    {
+        _npgsqlConnection = npgsqlConnection ?? throw new ArgumentNullException(nameof(npgsqlConnection));
+    }
 
     public async Task CreateAsync(ShortenedUrl shortenedUrl)
     {
-        //try
-        //{
-        //    var entity = new ShortenedUrlEntity
-        //    {
-        //        ShortUrlKey = shortenedUrl.UrlKey,
-        //        ActualUrl = shortenedUrl.ActualUrl
-        //    };
-
-        //    _dbContext.ShortenedUrls.Add(entity);
-
-        //    await _dbContext.SaveChangesAsync();
-        //}
-        //catch (DbUpdateException ex)
-        //{
-        //    if (ex.InnerException is PostgresException pex
-        //        && pex.SqlState == UniqueViolation)
-        //    {
-        //        throw new DuplicateShortUrlKeyException(shortenedUrl.UrlKey, ex);
-        //    }
-
-        //    throw;
-        //}
+        try
+        {
+            await _npgsqlConnection.ExecuteAsync(@"
+                INSERT INTO ""public"".""ShortenedUrls"" VALUES
+                (@ShortUrlKey, @ActualUrl)
+            ", new { ShortUrlKey = shortenedUrl.UrlKey, ActualUrl = shortenedUrl.ActualUrl });
+        }
+        catch (PostgresException ex)
+        when (ex.SqlState == UniqueViolation)
+        {
+            throw new DuplicateShortUrlKeyException(shortenedUrl.UrlKey, ex);
+        }
     }
 
     public async Task<ShortenedUrl?> GetAsync(string shortenedUrlKey)
     {
-        //var entity = await _dbContext.ShortenedUrls.FindAsync(shortenedUrlKey);
+        var entity = await _npgsqlConnection.QueryFirstOrDefaultAsync<ShortenedUrlEntity>(@"
+SELECT ""ShortUrlKey"", ""ActualUrl""
+FROM ""public"".""ShortenedUrls"" AS ""su""
+WHERE ""su"".""ShortUrlKey"" = @shortenedUrlKey",
+new { shortenedUrlKey });
 
-        //return entity is not null
-        //    ? new ShortenedUrl(entity.ShortUrlKey, entity.ActualUrl)
-        //    : null;
-
-        return null;
+        return entity is not null
+            ? new ShortenedUrl(entity.ShortUrlKey, entity.ActualUrl)
+            : null;
     }
 }

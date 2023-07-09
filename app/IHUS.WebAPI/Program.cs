@@ -1,10 +1,9 @@
 using System.Globalization;
-using IHUS.Database;
 using IHUS.Database.Repositories;
 using IHUS.Domain.Services.Generation.Implementations;
 using IHUS.Domain.Services.Generation.Interfaces;
 using IHUS.Domain.Services.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Serilog;
 
 namespace IHUS.WebAPI;
@@ -24,7 +23,6 @@ public class Program
             var app = BuildApp(args);
 
             ConfigureMiddlewares(app);
-            await Initialize(app);
 
             await app.RunAsync();
         }
@@ -36,15 +34,6 @@ public class Program
         {
             await Log.CloseAndFlushAsync();
         }
-    }
-
-    private static async Task Initialize(WebApplication app)
-    {
-        using var scope = app.Services.CreateScope();
-
-        //var dbContext = scope.ServiceProvider.GetRequiredService<IHUSDbContext>();
-
-        //await dbContext.Database.MigrateAsync();
     }
 
     private static WebApplication BuildApp(string[] args)
@@ -59,9 +48,8 @@ public class Program
                 .AddEndpointsApiExplorer()
                 .AddSwaggerGen();
 
-        //builder
-        //    .Services.AddDbContextPool<IHUSDbContext>(options =>
-        //        options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+        builder
+            .Services.AddNpgsqlDataSource(builder.Configuration.GetConnectionString("Default"));
 
         builder.Services
             .AddSingleton<IHashProvider, Sha256HashProvider>()
