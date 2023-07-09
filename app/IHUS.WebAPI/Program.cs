@@ -3,7 +3,6 @@ using IHUS.Database.Repositories;
 using IHUS.Domain.Services.Generation.Implementations;
 using IHUS.Domain.Services.Generation.Interfaces;
 using IHUS.Domain.Services.Repositories;
-using Npgsql;
 using Serilog;
 
 namespace IHUS.WebAPI;
@@ -57,6 +56,13 @@ public class Program
             .AddScoped<IShortenedUrlRepository, ShortenedUrlRepository>()
             .AddScoped<IShortenedUrlGenerator, HashBasedUrlShortener>();
 
+        builder.Services
+            .AddHealthChecks()
+            .AddNpgSql(
+                npgsqlConnectionString: builder.Configuration.GetConnectionString("HealthCheck"),
+                name: "PostgreSQL",
+                tags: new[] { "db", "sql", "postgresql" });
+
         builder.Host.UseSerilog((context, services, configuration) => configuration
             .ReadFrom.Configuration(context.Configuration)
             .ReadFrom.Services(services)
@@ -80,6 +86,7 @@ public class Program
     {
         app.UseSwagger();
         app.UseSwaggerUI();
+        app.UseHealthChecksPrometheusExporter("/health-metrics");
         app.UseSerilogRequestLogging();
         app.UseHttpsRedirection();
         app.UseAuthorization();
