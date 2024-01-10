@@ -1,39 +1,17 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Spectre.Console.Cli;
 
 internal class Program
 {
-    static void Main(string[] args)
+    static int Main(string[] args)
     {
-        Log.Logger = new LoggerConfiguration()
-            .Enrich.FromLogContext()
-            .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
-            .CreateBootstrapLogger();
-
-        try
-        {
-            string connectionString = args.Length == 1
-                ? args[0]
-                : throw new ArgumentException("Expected one argument containing connection string.");
-
-            using (var serviceProvider = CreateServices(connectionString))
-            using (var scope = serviceProvider.CreateScope())
-            {
-                // Put the database update into a scope to ensure
-                // that all resources will be disposed.
-                UpdateDatabase(scope.ServiceProvider);
-            }
-        }
-        catch (Exception exception)
-        {
-            Log.Fatal(exception, "Application terminated unexpectedly");
-        }
-        finally
-        {
-            Log.CloseAndFlush();
-        }
+        var app = new CommandApp<MigrateUpDbCommand>();
+        return app.Run(args);
     }
 
     /// <summary>
@@ -69,5 +47,43 @@ internal class Program
 
         // Execute the migrations
         runner.MigrateUp();
+    }
+
+    internal sealed class MigrateUpDbCommand : Command<MigrateUpDbCommand.Settings>
+    {
+        public sealed class Settings : CommandSettings
+        {
+            [Description("Connection string of a DB to migrate up.")]
+            [CommandArgument(0, "<connectionString>")]
+            public string ConnectionString { get; init; } = default!;
+        }
+
+        public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings)
+        {
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
+                .CreateBootstrapLogger();
+
+            try
+            {
+                using var serviceProvider = CreateServices(settings.ConnectionString);
+                using var scope = serviceProvider.CreateScope();
+
+                UpdateDatabase(scope.ServiceProvider);
+
+                return 0;
+            }
+            catch (Exception exception)
+            {
+                Log.Fatal(exception, "Application terminated unexpectedly.");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
+            return 1;
+        }
     }
 }
