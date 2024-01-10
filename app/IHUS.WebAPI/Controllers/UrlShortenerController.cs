@@ -56,7 +56,7 @@ public class UrlShortenerController : ControllerBase
         }
         catch (CantCreateShortenedUrlException ex)
         {
-            _logger.LogInformation(ex, "Short URL can't be created");
+            _logger.LogCantCreateShortenedUrlException(ex);
             return BadRequest(new ErrorResponse("Can't create shortened URL. Please try again."));
         }
     }
