@@ -3,6 +3,7 @@ using IHUS.Database.Repositories;
 using IHUS.Domain.Services.Generation.Implementations;
 using IHUS.Domain.Services.Generation.Interfaces;
 using IHUS.Domain.Services.Repositories;
+using IHUS.WebAPI.Infrastructure.Extensions;
 using Serilog;
 
 namespace IHUS.WebAPI;
@@ -21,7 +22,7 @@ public class Program
         {
             var app = BuildApp(args);
 
-            ConfigureMiddlewares(app);
+            ConfigureMiddlewarePipeline(app);
 
             await app.RunAsync();
         }
@@ -48,7 +49,7 @@ public class Program
                 .AddSwaggerGen();
 
         builder
-            .Services.AddNpgsqlDataSource(builder.Configuration.GetConnectionString("Default"));
+            .Services.AddNpgsqlDataSource(builder.Configuration.GetRequiredConnectionString("Default"));
 
         builder.Services
             .AddSingleton<IHashProvider, Sha256HashProvider>()
@@ -59,7 +60,7 @@ public class Program
         builder.Services
             .AddHealthChecks()
             .AddNpgSql(
-                npgsqlConnectionString: builder.Configuration.GetConnectionString("HealthCheck"),
+                npgsqlConnectionString: builder.Configuration.GetRequiredConnectionString("HealthCheck"),
                 name: "PostgreSQL",
                 tags: new[] { "db", "sql", "postgresql" });
 
@@ -82,7 +83,7 @@ public class Program
         return builder.Build();
     }
 
-    private static void ConfigureMiddlewares(WebApplication app)
+    private static void ConfigureMiddlewarePipeline(WebApplication app)
     {
         app.UseSwagger();
         app.UseSwaggerUI();
