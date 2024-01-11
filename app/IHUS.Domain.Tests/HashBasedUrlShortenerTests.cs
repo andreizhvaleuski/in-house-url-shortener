@@ -84,4 +84,29 @@ public sealed class HashBasedUrlShortenerTests
         hashProviderMock.VerifyNoOtherCalls();
         saltProviderMock.VerifyNoOtherCalls();
     }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData(" ")]
+    public async Task GenerateAsyncShouldNotAllowNullOrWhiteSpaceActualUrlArgument(string? actualUrl)
+    {
+        var shortenedUrlRepositoryMock = new Mock<IShortenedUrlRepository>();
+        var hashProviderMock = new Mock<IHashProvider>();
+        var saltProviderMock = new Mock<ISaltProvider>();
+
+        var hashBasedUrlShortener = new HashBasedUrlShortener(
+            hashProviderMock.Object,
+            shortenedUrlRepositoryMock.Object,
+            saltProviderMock.Object);
+
+#pragma warning disable CS8604 // Possible null reference argument.
+        _ = await Assert.ThrowsAsync<ArgumentException>(
+            () => hashBasedUrlShortener.GenerateAsync(actualUrl));
+#pragma warning restore CS8604 // Possible null reference argument.
+
+        shortenedUrlRepositoryMock.VerifyNoOtherCalls();
+        hashProviderMock.VerifyNoOtherCalls();
+        saltProviderMock.VerifyNoOtherCalls();
+    }
 }

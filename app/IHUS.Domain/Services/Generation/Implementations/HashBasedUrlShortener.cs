@@ -5,6 +5,7 @@ using IHUS.Domain.Services.Generation.Interfaces;
 using IHUS.Domain.Services.Repositories;
 using Polly;
 using Polly.Timeout;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace IHUS.Domain.Services.Generation.Implementations;
@@ -39,7 +40,7 @@ public sealed class HashBasedUrlShortener : IShortenedUrlGenerator
             : shortenedUrl;
     }
 
-    public async Task<ShortenedUrl> GenerateAsync(string actualUrl)
+    public async Task<ShortenedUrl> GenerateAsync([NotNull] string actualUrl)
     {
         ValidateActualUrl(actualUrl);
 
