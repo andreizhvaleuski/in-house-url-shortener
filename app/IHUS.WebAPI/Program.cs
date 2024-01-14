@@ -19,6 +19,8 @@ public class Program
         await app.RunAsync();
     }
 
+    private static readonly string[] PostgreSqlHealthCheckTags = ["db", "sql", "postgresql"];
+
     private static WebApplication BuildApp(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -47,7 +49,7 @@ public class Program
             .AddNpgSql(
                 connectionString: builder.Configuration.GetRequiredConnectionString("HealthCheck"),
                 name: "PostgreSQL",
-                tags: new[] { "db", "sql", "postgresql" });
+                tags: PostgreSqlHealthCheckTags);
 
         builder.Host.UseSerilog((context, services, configuration) => configuration
             .ReadFrom.Configuration(context.Configuration)

@@ -1,6 +1,8 @@
 ﻿using FluentMigrator;
 using IHUS.Domain.Constants;
 
+namespace IHUS.Database.Migrations;
+
 [Migration(20220708110948)]
 public sealed class Initial : Migration
 {
