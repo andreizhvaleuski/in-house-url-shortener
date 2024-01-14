@@ -48,11 +48,11 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Unit Test
-      run: dotnet test --no-build --verbosity normal --filter FullyQualifiedName~Unit
+      run: dotnet test --no-build --verbosity normal --filter "FullyQualifiedName~.Tests.Unit"
     - name: Integration Test Migration
       run: dotnet run "$POSTGRES_CONNECTION_STRING" --no-build --project IHUS.Database.Migrator/IHUS.Database.Migrator.csproj
     - name: Integration Test
-      run: dotnet test --no-build --verbosity normal --filter FullyQualifiedName~Integration
+      run: dotnet test --no-build --verbosity normal --filter "FullyQualifiedName~.Tests.Integration"
       env:
         ConnectionStrings__Default: "${{ env.POSTGRES_CONNECTION_STRING }}"
         ConnectionStrings__HealthCheck: "${{ env.POSTGRES_CONNECTION_STRING }}"
