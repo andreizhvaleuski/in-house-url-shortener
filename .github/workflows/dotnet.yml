@@ -18,6 +18,19 @@ jobs:
       run:
         working-directory: ./app
 
+    services:
+      postgres:
+        image: postgres:16.1
+        env:
+          POSTGRES_USERNAME: username
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: IHUS
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -30,3 +43,8 @@ jobs:
       run: dotnet build --no-restore
     - name: Unit Test
       run: dotnet test --no-build --verbosity normal --filter FullyQualifiedName~Unit
+    - name: Integration Test
+      run: dotnet test --no-build --verbosity normal --filter FullyQualifiedName~Integration
+      env:
+        ConnectionStrings__Default: Host=postgres;Port=5432;Username=username;Password=password;Database=IHUS
+        ConnectionStrings__HealthCheck: Host=postgres;Port=5432;Username=username;Password=password;Database=IHUS
