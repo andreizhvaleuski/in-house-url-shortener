@@ -38,12 +38,12 @@ public class UrlShortenerController : ControllerBase
     }
 
     [HttpPost(Name = "CreateShortUrl")]
-    public async Task<IActionResult> Create([FromBody] CreateShortUrlRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateShortUrlRequest request, CancellationToken cancellationToken)
     {
         try
         {
             var shortenedUrl = request.ShortUrl is null
-                ? await _shortenedUrlGenerator.GenerateAsync(request.ActualUrl)
+                ? await _shortenedUrlGenerator.GenerateAsync(request.ActualUrl, cancellationToken)
                 : await _shortenedUrlGenerator.GenerateAsync(
                     request.ShortUrl,
                     request.ActualUrl);

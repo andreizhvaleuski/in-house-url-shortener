@@ -6,7 +6,7 @@ public interface IShortenedUrlGenerator
 {
     public Task<ShortenedUrl> GetAsync(string shortUrlKey);
 
-    public Task<ShortenedUrl> GenerateAsync(string actualUrl);
+    public Task<ShortenedUrl> GenerateAsync(string actualUrl, CancellationToken cancellationToken);
 
     public Task<ShortenedUrl> GenerateAsync(string shortUrlKey, string actualUrl);
 }

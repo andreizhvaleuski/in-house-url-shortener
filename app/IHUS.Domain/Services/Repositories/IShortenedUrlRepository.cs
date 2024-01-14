@@ -6,5 +6,5 @@ public interface IShortenedUrlRepository
 {
     public Task<ShortenedUrl?> GetAsync(string shortenedUrlKey);
 
-    public Task CreateAsync(ShortenedUrl shortenedUrl);
+    public Task CreateAsync(ShortenedUrl shortenedUrl, CancellationToken cancellationToken);
 }

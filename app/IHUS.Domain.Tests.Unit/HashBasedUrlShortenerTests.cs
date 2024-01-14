@@ -39,7 +39,7 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
         _shortenedUrlRepositoryMock = new Mock<IShortenedUrlRepository>();
         _shortenedUrlRepositoryMock.Setup(mock => mock.GetAsync(It.IsAny<string>()))
             .ReturnsAsync(new ShortenedUrl("123xyz", "https://example.com"));
-        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()));
+        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()));
 
         _hashBasedUrlShortenerOptionsMock = new Mock<IOptions<HashBasedUrlShortenerOptions>>();
         _hashBasedUrlShortenerOptionsMock.SetupGet(mock => mock.Value)
@@ -136,7 +136,7 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
 
 #pragma warning disable CS8604 // Possible null reference argument.
         _ = await Assert.ThrowsAsync<ArgumentException>(
-            () => hashBasedUrlShortener.GenerateAsync(actualUrl));
+            () => hashBasedUrlShortener.GenerateAsync(actualUrl, CancellationToken.None));
 #pragma warning restore CS8604 // Possible null reference argument.
     }
 
@@ -171,19 +171,19 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
     {
         var internalException = new TimeoutRejectedException();
 
-        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()))
+        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(internalException);
 
         var hashBasedUrlShortener = BuildHashBasedUrlShortener();
 
 #pragma warning disable CS8604 // Possible null reference argument.
         var wrappedException = await Assert.ThrowsAsync<CantCreateShortenedUrlException>(
-            () => hashBasedUrlShortener.GenerateAsync("example.com"));
+            () => hashBasedUrlShortener.GenerateAsync("example.com", CancellationToken.None));
 #pragma warning restore CS8604 // Possible null reference argument.
 
         Assert.Equal(internalException, wrappedException.InnerException);
 
-        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()), Times.AtLeastOnce);
+        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
         _hashProviderMock.Verify(mock => mock.CalculateHash(It.IsAny<byte[]>()), Times.AtLeastOnce);
         _saltProviderMock.Verify(mock => mock.GetSalt(), Times.AtLeastOnce);
     }
@@ -195,19 +195,19 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
         var innerException = new Exception("Inner exception");
         var internalException = new DuplicateShortUrlKeyException(shortUrlKey, innerException);
 
-        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()))
+        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(internalException);
 
         var hashBasedUrlShortener = BuildHashBasedUrlShortener();
 
 #pragma warning disable CS8604 // Possible null reference argument.
         var wrappedException = await Assert.ThrowsAsync<CantCreateShortenedUrlException>(
-            () => hashBasedUrlShortener.GenerateAsync("example.com"));
+            () => hashBasedUrlShortener.GenerateAsync("example.com", CancellationToken.None));
 #pragma warning restore CS8604 // Possible null reference argument.
 
         Assert.Equal(internalException, wrappedException.InnerException);
 
-        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()), Times.AtLeastOnce);
+        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
         _hashProviderMock.Verify(mock => mock.CalculateHash(It.IsAny<byte[]>()), Times.AtLeastOnce);
         _saltProviderMock.Verify(mock => mock.GetSalt(), Times.AtLeastOnce);
     }
@@ -220,7 +220,7 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
         var internalException = new DuplicateShortUrlKeyException(shortUrlKey, innerException);
 
         var shortenedUrlRepositoryMockSetupSequence = _shortenedUrlRepositoryMock
-            .SetupSequence(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()));
+            .SetupSequence(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()));
 
         for (int i = 0; i < _retryCount; i++)
         {
@@ -230,11 +230,11 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
         shortenedUrlRepositoryMockSetupSequence.Returns(Task.CompletedTask);
 
         var hashBasedUrlShortener = BuildHashBasedUrlShortener();
-        await hashBasedUrlShortener.GenerateAsync("https://example.com");
+        await hashBasedUrlShortener.GenerateAsync("https://example.com", CancellationToken.None);
 
         var executionNumber = _retryCount + 1;
 
-        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()), Times.Exactly(executionNumber));
+        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()), Times.Exactly(executionNumber));
         _hashProviderMock.Verify(mock => mock.CalculateHash(It.IsAny<byte[]>()), Times.Exactly(executionNumber));
         _saltProviderMock.Verify(mock => mock.GetSalt(), Times.Exactly(executionNumber));
     }
@@ -244,33 +244,33 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
     {
         var exception = new Exception("Inner exception");
 
-        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()))
+        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(exception);
 
         var hashBasedUrlShortener = BuildHashBasedUrlShortener();
         await Assert.ThrowsAsync<Exception>(
-            () => hashBasedUrlShortener.GenerateAsync("https://example.com"));
+            () => hashBasedUrlShortener.GenerateAsync("https://example.com", CancellationToken.None));
 
-        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()), Times.Once);
+        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()), Times.Once);
         _hashProviderMock.Verify(mock => mock.CalculateHash(It.IsAny<byte[]>()), Times.Once);
         _saltProviderMock.Verify(mock => mock.GetSalt(), Times.Once);
     }
 
     [Fact]
-    public async Task GenerateAsync_ShouldTimeotBasedOnTimeoutOptions_WhenDuplicateShortUrlKeyExceptionIsThrown()
+    public async Task GenerateAsync_ShouldTimeotBasedOnTimeoutOptions_WhenExecutionTakesMoreTimeThanAllowed()
     {
-        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()))
-            .Returns(Task.Delay(TimeSpan.FromSeconds(_timeoutSeconds + 1)));
+        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()))
+            .Returns<ShortenedUrl, CancellationToken>((_, cancellationToken) => Task.Delay(TimeSpan.FromSeconds(_timeoutSeconds + 2), cancellationToken));
 
         var hashBasedUrlShortener = BuildHashBasedUrlShortener();
         var exception = await Assert.ThrowsAsync<CantCreateShortenedUrlException>(
-            () => hashBasedUrlShortener.GenerateAsync("https://example.com"));
+            () => hashBasedUrlShortener.GenerateAsync("https://example.com", CancellationToken.None));
 
         Assert.IsType<TimeoutRejectedException>(exception.InnerException);
 
-        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()), Times.AtLeastOnce);
-        _hashProviderMock.Verify(mock => mock.CalculateHash(It.IsAny<byte[]>()), Times.AtLeastOnce);
-        _saltProviderMock.Verify(mock => mock.GetSalt(), Times.AtLeastOnce);
+        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>(), It.IsAny<CancellationToken>()), Times.Between(0, int.MaxValue, Moq.Range.Inclusive));
+        _hashProviderMock.Verify(mock => mock.CalculateHash(It.IsAny<byte[]>()), Times.Between(0, int.MaxValue, Moq.Range.Inclusive));
+        _saltProviderMock.Verify(mock => mock.GetSalt(), Times.Between(0, int.MaxValue, Moq.Range.Inclusive));
     }
 
     public static IEnumerable<object?[]> GetWhiteSpaceArguments(int argumentsNumber = 1)

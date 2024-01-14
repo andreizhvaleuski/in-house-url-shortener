@@ -17,14 +17,19 @@ public class ShortenedUrlRepository : IShortenedUrlRepository
         _npgsqlConnection = npgsqlConnection ?? throw new ArgumentNullException(nameof(npgsqlConnection));
     }
 
-    public async Task CreateAsync(ShortenedUrl shortenedUrl)
+    public async Task CreateAsync(ShortenedUrl shortenedUrl, CancellationToken cancellationToken)
     {
         try
         {
-            await _npgsqlConnection.ExecuteAsync(@"
-                INSERT INTO ""public"".""ShortenedUrls"" VALUES
-                (@ShortUrlKey, @ActualUrl)
-            ", new { ShortUrlKey = shortenedUrl.UrlKey, ActualUrl = shortenedUrl.ActualUrl });
+            await _npgsqlConnection.ExecuteAsync(new CommandDefinition(
+                commandText:
+@"INSERT INTO ""public"".""ShortenedUrls"" VALUES
+(@ShortUrlKey, @ActualUrl)",
+                parameters: new
+                { 
+                    ShortUrlKey = shortenedUrl.UrlKey,
+                    ActualUrl = shortenedUrl.ActualUrl },
+                cancellationToken: cancellationToken));
         }
         catch (PostgresException ex)
         when (ex.SqlState == UniqueViolation)

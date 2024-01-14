@@ -45,7 +45,7 @@ public class Program
         builder.Services
             .AddHealthChecks()
             .AddNpgSql(
-                npgsqlConnectionString: builder.Configuration.GetRequiredConnectionString("HealthCheck"),
+                connectionString: builder.Configuration.GetRequiredConnectionString("HealthCheck"),
                 name: "PostgreSQL",
                 tags: new[] { "db", "sql", "postgresql" });
 
