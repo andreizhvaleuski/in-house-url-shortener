@@ -18,6 +18,9 @@ jobs:
       run:
         working-directory: ./app
 
+    env:
+      POSTGRES_CONNECTION_STRING: Host=postgres;Port=5432;Username=username;Password=postgres;Database=IHUS
+
     services:
       postgres:
         image: postgres:16.1
@@ -46,8 +49,10 @@ jobs:
       run: dotnet build --no-restore
     - name: Unit Test
       run: dotnet test --no-build --verbosity normal --filter FullyQualifiedName~Unit
+    - name: Integration Test Migration
+      run: dotnet run $POSTGRES_CONNECTION_STRING --no-build --project IHUS.Database.Migrator/IHUS.Database.Migrator.csproj
     - name: Integration Test
       run: dotnet test --no-build --verbosity normal --filter FullyQualifiedName~Integration
       env:
-        ConnectionStrings__Default: Host=postgres;Port=5432;Username=username;Password=password;Database=IHUS
-        ConnectionStrings__HealthCheck: Host=postgres;Port=5432;Username=username;Password=password;Database=IHUS
+        ConnectionStrings__Default: $POSTGRES_CONNECTION_STRING
+        ConnectionStrings__HealthCheck: $POSTGRES_CONNECTION_STRING
