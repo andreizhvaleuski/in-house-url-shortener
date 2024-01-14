@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IHUS.Database.Migrator", "I
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E2D73DCA-2071-41C4-8EF6-6C5C23297376}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IHUS.Domain.Tests.Unit", "IHUS.Domain.Tests\IHUS.Domain.Tests.Unit.csproj", "{E1B5BA36-0B81-4253-9C34-680770C32AFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IHUS.Domain.Tests.Unit", "IHUS.Domain.Tests.Unit\IHUS.Domain.Tests.Unit.csproj", "{E1B5BA36-0B81-4253-9C34-680770C32AFE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IHUS.WebAPI.Tests.Integration", "IHUS.WebAPI.Tests.Integration\IHUS.WebAPI.Tests.Integration.csproj", "{585AACC2-AC60-40A6-9006-AAB1919AE71C}"
 EndProject
