@@ -236,6 +236,23 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
     }
 
     [Fact]
+    public async Task GenerateAsync_ShouldNotRetryBasedOnRetryOption_WhenNotDuplicateShortUrlKeyExceptionIsThrown()
+    {
+        var exception = new Exception("Inner exception");
+
+        _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()))
+            .ThrowsAsync(exception);
+
+        var hashBasedUrlShortener = BuildHashBasedUrlShortener();
+        await Assert.ThrowsAsync<Exception>(
+            () => hashBasedUrlShortener.GenerateAsync("https://example.com"));
+
+        _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()), Times.Once);
+        _hashProviderMock.Verify(mock => mock.CalculateHash(It.IsAny<byte[]>()), Times.Once);
+        _saltProviderMock.Verify(mock => mock.GetSalt(), Times.Once);
+    }
+
+    [Fact]
     public async Task GenerateAsync_ShouldTimeotBasedOnTimeoutOptions_WhenDuplicateShortUrlKeyExceptionIsThrown()
     {
         _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()))
