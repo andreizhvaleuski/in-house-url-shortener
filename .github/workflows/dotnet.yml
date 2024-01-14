@@ -50,7 +50,7 @@ jobs:
     - name: Unit Test
       run: dotnet test --no-build --verbosity normal --filter FullyQualifiedName~Unit
     - name: Integration Test Migration
-      run: dotnet run "${{ POSTGRES_CONNECTION_STRING }}" --no-build --project IHUS.Database.Migrator/IHUS.Database.Migrator.csproj
+      run: dotnet run $POSTGRES_CONNECTION_STRING --no-build --project IHUS.Database.Migrator/IHUS.Database.Migrator.csproj
     - name: Integration Test
       run: dotnet test --no-build --verbosity normal --filter FullyQualifiedName~Integration
       env:
