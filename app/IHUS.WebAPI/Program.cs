@@ -12,28 +12,11 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        Log.Logger = new LoggerConfiguration()
-            .Enrich.FromLogContext()
-            .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
-            .WriteTo.Debug(formatProvider: CultureInfo.InvariantCulture)
-            .CreateBootstrapLogger();
+        var app = BuildApp(args);
 
-        try
-        {
-            var app = BuildApp(args);
+        ConfigureMiddlewarePipeline(app);
 
-            ConfigureMiddlewarePipeline(app);
-
-            await app.RunAsync();
-        }
-        catch (Exception exception)
-        {
-            Log.Fatal(exception, "Application terminated unexpectedly");
-        }
-        finally
-        {
-            await Log.CloseAndFlushAsync();
-        }
+        await app.RunAsync();
     }
 
     private static WebApplication BuildApp(string[] args)
@@ -55,7 +38,9 @@ public class Program
             .AddSingleton<IHashProvider, Sha256HashProvider>()
             .AddSingleton<ISaltProvider, RngSaltProvider>()
             .AddScoped<IShortenedUrlRepository, ShortenedUrlRepository>()
-            .AddScoped<IShortenedUrlGenerator, HashBasedUrlShortener>();
+            .AddScoped<IShortenedUrlGenerator, HashBasedUrlShortener>()
+            .Configure<HashBasedUrlShortenerOptions>(
+                builder.Configuration.GetSection("HashBasedUrlShortener"));
 
         builder.Services
             .AddHealthChecks()

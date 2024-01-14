@@ -1,7 +1,8 @@
 {
   "profiles": {
     "IHUS.Database.Migrator": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "Host=localhost;Port=5432;Username=username;Password=password;Database=IHUS"
     }
   }
 }

@@ -43,7 +43,11 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
 
         _hashBasedUrlShortenerOptionsMock = new Mock<IOptions<HashBasedUrlShortenerOptions>>();
         _hashBasedUrlShortenerOptionsMock.SetupGet(mock => mock.Value)
-            .Returns(() => new HashBasedUrlShortenerOptions(_retryCount, _timeoutSeconds));
+            .Returns(() => new HashBasedUrlShortenerOptions
+            { 
+                RetryCount = _retryCount,
+                TimeoutSeconds = _timeoutSeconds
+            });
     }
 
     [Theory]

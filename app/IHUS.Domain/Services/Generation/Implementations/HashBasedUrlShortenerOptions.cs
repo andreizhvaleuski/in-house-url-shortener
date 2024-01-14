@@ -2,23 +2,7 @@
 
 public sealed class HashBasedUrlShortenerOptions
 {
-    public int RetryCount { get; }
+    public int RetryCount { get; init; } = 3;
 
-    public int TimeoutSeconds { get; }
-
-    public HashBasedUrlShortenerOptions(int retryCount, int timeoutSeconds)
-    {
-        if (retryCount < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(retryCount));
-        }
-
-        if (timeoutSeconds <= 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(timeoutSeconds));
-        }
-
-        RetryCount = retryCount;
-        TimeoutSeconds = timeoutSeconds;
-    }
+    public int TimeoutSeconds { get; init; } = 2;
 }
