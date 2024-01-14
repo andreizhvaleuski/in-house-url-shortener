@@ -3,6 +3,7 @@ using IHUS.Domain.Constants;
 using IHUS.Domain.Entities;
 using IHUS.Domain.Services.Generation.Interfaces;
 using IHUS.Domain.Services.Repositories;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Timeout;
 using System.Diagnostics.CodeAnalysis;
@@ -12,17 +13,16 @@ namespace IHUS.Domain.Services.Generation.Implementations;
 
 public sealed class HashBasedUrlShortener : IShortenedUrlGenerator
 {
-    private const int RetryCount = 3;
-    private const int TimeoutSeconds = 2;
-
     private readonly IHashProvider _hashProvider;
     private readonly IShortenedUrlRepository _shortenedUrlRepository;
     private readonly ISaltProvider _saltProvider;
+    private readonly HashBasedUrlShortenerOptions _options;
 
     public HashBasedUrlShortener(
         IHashProvider hashProvider,
         IShortenedUrlRepository shortenedUrlRepository,
-        ISaltProvider saltProvider)
+        ISaltProvider saltProvider,
+        IOptions<HashBasedUrlShortenerOptions> options)
     {
         _hashProvider = hashProvider
             ?? throw new ArgumentNullException(nameof(hashProvider));
@@ -30,6 +30,8 @@ public sealed class HashBasedUrlShortener : IShortenedUrlGenerator
             ?? throw new ArgumentNullException(nameof(shortenedUrlRepository));
         _saltProvider = saltProvider
             ?? throw new ArgumentNullException(nameof(saltProvider));
+        _options = options?.Value
+            ?? throw new ArgumentNullException(nameof(options));
     }
 
     public async Task<ShortenedUrl> GetAsync(string shortUrlKey)
@@ -45,10 +47,10 @@ public sealed class HashBasedUrlShortener : IShortenedUrlGenerator
     {
         ValidateActualUrl(actualUrl);
 
-        var timeoutPolicy = Policy.TimeoutAsync(TimeoutSeconds, TimeoutStrategy.Pessimistic);
+        var timeoutPolicy = Policy.TimeoutAsync(_options.TimeoutSeconds, TimeoutStrategy.Pessimistic);
         var exceptionPolicy = Policy
             .Handle<DuplicateShortUrlKeyException>()
-            .RetryAsync(RetryCount);
+            .RetryAsync(_options.RetryCount);
 
         var executionPolicy = Policy.WrapAsync(timeoutPolicy, exceptionPolicy);
 
