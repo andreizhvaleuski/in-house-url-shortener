@@ -197,7 +197,7 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(argumentsNumber);
 
-        string?[] whiteSpaces = [null, "", " ", "\t", "\r", "\n", "\n\r"];
+        string?[] whiteSpaces = [null, "", '\u00A0'.ToString(), " ", "\t", "\r", "\n", "\n\r"];
 
         return argumentsNumber switch
         {
