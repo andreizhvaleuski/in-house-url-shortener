@@ -19,7 +19,7 @@ jobs:
         working-directory: ./app
 
     env:
-      POSTGRES_CONNECTION_STRING: Server=127.0.0.1;Port=5432;Database=IHUS;User Id=username;Password=postgres;
+      POSTGRES_CONNECTION_STRING: "Server=127.0.0.1;Port=5432;Database=IHUS;User Id=username;Password=postgres;"
 
     services:
       postgres:
