@@ -25,6 +25,7 @@ jobs:
           POSTGRES_USERNAME: username
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: IHUS
+          POSTGRES_PORT: 5432
         ports:
           - 5432:5432
         options: >-
