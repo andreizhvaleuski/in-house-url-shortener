@@ -28,7 +28,8 @@ public sealed class HashBasedUrlShortener : IShortenedUrlGenerator
             ?? throw new ArgumentNullException(nameof(hashProvider));
         _shortenedUrlRepository = shortenedUrlRepository
             ?? throw new ArgumentNullException(nameof(shortenedUrlRepository));
-        _saltProvider = saltProvider;
+        _saltProvider = saltProvider
+            ?? throw new ArgumentNullException(nameof(saltProvider));
     }
 
     public async Task<ShortenedUrl> GetAsync(string shortUrlKey)

@@ -40,6 +40,28 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
         _shortenedUrlRepositoryMock.Setup(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()));
     }
 
+    [Theory]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    [InlineData(false, false, true)]
+    [InlineData(false, true, true)]
+    [InlineData(true, false, true)]
+    [InlineData(true, true, false)]
+    [InlineData(true, true, true)]
+    public void Constructor_ShouldThrowArgumentNullException_WhenAnyArgumentIsNull(
+        bool hashProviderIsNull,
+        bool shortenedUrlRepositoryIsNull,
+        bool saltProviderIsNull)
+    {
+#pragma warning disable CS8604 // Possible null reference argument.
+        Assert.Throws<ArgumentNullException>(
+            () => new HashBasedUrlShortener(
+                hashProvider: hashProviderIsNull ? null : _hashProviderMock.Object,
+                shortenedUrlRepository: shortenedUrlRepositoryIsNull ? null : _shortenedUrlRepositoryMock.Object,
+                saltProvider: saltProviderIsNull ? null : _saltProviderMock.Object));
+#pragma warning restore CS8604 // Possible null reference argument.
+    }
+
     [Fact]
     public async Task GetAsync_ShouldThrowShortenedUrlNotFoundException_WhenShortUrlKeyDoesntExist()
     {
@@ -125,21 +147,6 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
 #pragma warning restore CS8604 // Possible null reference argument.
     }
 
-    public static IEnumerable<object?[]> GetWhiteSpaceArguments(int argumentsNumber = 1)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(argumentsNumber);
-
-        string?[] whiteSpaces = [null, "", " ", "\t", "\r", "\n", "\n\r"];
-
-        return argumentsNumber switch
-        {
-            1 => whiteSpaces.Select(whiteSpace => new object?[] { whiteSpace }),
-            2 => whiteSpaces.SelectMany(whiteSpace => whiteSpaces
-                .Select(ws2 => new object?[] { whiteSpace, ws2 })),
-            _ => throw new ArgumentOutOfRangeException(nameof(argumentsNumber))
-        };
-    }
-
     [Fact]
     public async Task GenerateAsync_ShouldThrowCantCreateShortenedUrlException_WhenTimeoutRejectedExceptionIsCaught()
     {
@@ -184,6 +191,21 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
         _shortenedUrlRepositoryMock.Verify(mock => mock.CreateAsync(It.IsAny<ShortenedUrl>()), Times.AtLeastOnce);
         _hashProviderMock.Verify(mock => mock.CalculateHash(It.IsAny<byte[]>()), Times.AtLeastOnce);
         _saltProviderMock.Verify(mock => mock.GetSalt(), Times.AtLeastOnce);
+    }
+
+    public static IEnumerable<object?[]> GetWhiteSpaceArguments(int argumentsNumber = 1)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(argumentsNumber);
+
+        string?[] whiteSpaces = [null, "", " ", "\t", "\r", "\n", "\n\r"];
+
+        return argumentsNumber switch
+        {
+            1 => whiteSpaces.Select(whiteSpace => new object?[] { whiteSpace }),
+            2 => whiteSpaces.SelectMany(whiteSpace => whiteSpaces
+                .Select(ws2 => new object?[] { whiteSpace, ws2 })),
+            _ => throw new ArgumentOutOfRangeException(nameof(argumentsNumber))
+        };
     }
 
     public void Dispose()
