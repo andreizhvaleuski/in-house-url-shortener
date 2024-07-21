@@ -3,15 +3,10 @@ using static IHUS.WebAPI.Controllers.UrlShortenerController;
 
 namespace IHUS.WebAPI.Tests.Integration;
 
-public sealed class UrlShortenerControllerTests
-    : IClassFixture<StashboxWebApplicationFactory<Program>>
+public sealed class UrlShortenerControllerTests(StashboxWebApplicationFactory<Program> factory)
+        : IClassFixture<StashboxWebApplicationFactory<Program>>
 {
-    private readonly StashboxWebApplicationFactory<Program> _factory;
-
-    public UrlShortenerControllerTests(StashboxWebApplicationFactory<Program> factory)
-    {
-        _factory = factory;
-    }
+    private readonly StashboxWebApplicationFactory<Program> _factory = factory;
 
     [Fact]
     public async Task CreateShortUrl_ShouldReturnShortUrl_WhichCanBeUsedToAccessActualUrl()
