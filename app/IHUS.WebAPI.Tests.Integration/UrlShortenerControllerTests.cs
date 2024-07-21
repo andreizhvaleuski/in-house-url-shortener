@@ -6,6 +6,7 @@ namespace IHUS.WebAPI.Tests.Integration;
 public sealed class UrlShortenerControllerTests(StashboxWebApplicationFactory<Program> factory)
         : IClassFixture<StashboxWebApplicationFactory<Program>>
 {
+    private const string ControllerBaseUri = "/api/UrlShortener/";
     private readonly StashboxWebApplicationFactory<Program> _factory = factory;
 
     [Fact]
@@ -18,7 +19,7 @@ public sealed class UrlShortenerControllerTests(StashboxWebApplicationFactory<Pr
         var expectedActualUrl = new Uri("https://example.com");
 
         var createShortUrlResponseMessage = await client.PostAsJsonAsync(
-            "/api/UrlShortener/",
+            ControllerBaseUri,
             new
             {
                 actualUrl = expectedActualUrl.ToString(),
@@ -31,7 +32,9 @@ public sealed class UrlShortenerControllerTests(StashboxWebApplicationFactory<Pr
         Assert.NotNull(createShortUrlResponseBody);
         Assert.False(string.IsNullOrWhiteSpace(createShortUrlResponseBody.ShortUrl));
 
-        var getShortUrlResponseMessage = await client.GetAsync(createShortUrlResponseBody.ShortUrl);
+        string getRealByKeyUrl = ControllerBaseUri + createShortUrlResponseBody.ShortUrl;
+        var getShortUrlResponseMessage = await client.GetAsync(
+            getRealByKeyUrl);
         getShortUrlResponseMessage.EnsureSuccessStatusCode();
         var getShortUrlResponseBody = await getShortUrlResponseMessage
             .Content
