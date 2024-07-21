@@ -13,13 +13,12 @@ public sealed class UrlShortenerControllerTests(StashboxWebApplicationFactory<Pr
     {
         var client = _factory.StashClient((services, httpClientOptions) =>
         {
-            httpClientOptions.BaseAddress = new Uri("http://localhost/api/UrlShortener/");
         });
 
         var expectedActualUrl = new Uri("https://example.com");
 
         var createShortUrlResponseMessage = await client.PostAsJsonAsync(
-            "",
+            "/api/UrlShortener/",
             new
             {
                 actualUrl = expectedActualUrl.ToString(),
