@@ -1,4 +1,5 @@
-﻿using Stashbox.AspNetCore.Testing;
+﻿using System.Net;
+using Stashbox.AspNetCore.Testing;
 using static IHUS.WebAPI.Controllers.UrlShortenerController;
 
 namespace IHUS.WebAPI.Tests.Integration;
@@ -43,5 +44,27 @@ public sealed class UrlShortenerControllerTests(StashboxWebApplicationFactory<Pr
         Assert.NotNull(getShortUrlResponseBody);
         Assert.False(string.IsNullOrWhiteSpace(getShortUrlResponseBody.ActualUrl));
         Assert.Equal(expectedActualUrl, new Uri(getShortUrlResponseBody.ActualUrl));
+    }
+
+    [Fact]
+    public async Task GetActualUrl_ShouldReturn404NotFound_WhenShortUrlKeyUnknown()
+    {
+        var client = _factory.StashClient((services, httpClientOptions) =>
+        {
+        });
+
+        var shortUrlKey = "123456";
+        var getRealByKeyUrl = ControllerBaseUri + shortUrlKey;
+        var getShortUrlResponseMessage = await client.GetAsync(getRealByKeyUrl);
+
+        Assert.Equal(HttpStatusCode.NotFound, getShortUrlResponseMessage.StatusCode);
+        
+        var errorResponse = await getShortUrlResponseMessage
+            .Content
+            .ReadFromJsonAsync<ErrorResponse>();
+
+        Assert.NotNull(errorResponse);
+        Assert.False(string.IsNullOrWhiteSpace(errorResponse.Message));
+        Assert.Contains(shortUrlKey, errorResponse.Message);
     }
 }
