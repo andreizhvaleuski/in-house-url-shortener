@@ -109,14 +109,14 @@ public sealed class HashBasedUrlShortener : IShortenedUrlGenerator
         return shourtUrlKey;
     }
 
-    public async Task<ShortenedUrl> GenerateAsync(string shortUrlKey, string actualUrl)
+    public async Task<ShortenedUrl> GenerateAsync(string shortUrlKey, string actualUrl, CancellationToken cancellationToken)
     {
         ValidateShortUrlKey(shortUrlKey);
         ValidateActualUrl(actualUrl);
 
         var shortenedUrl = new ShortenedUrl(shortUrlKey, actualUrl);
 
-        await _shortenedUrlRepository.CreateAsync(shortenedUrl, default);
+        await _shortenedUrlRepository.CreateAsync(shortenedUrl, cancellationToken);
 
         return shortenedUrl;
     }

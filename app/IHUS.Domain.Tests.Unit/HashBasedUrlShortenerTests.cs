@@ -148,7 +148,7 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
 
 #pragma warning disable CS8604 // Possible null reference argument.
         _ = await Assert.ThrowsAsync<ArgumentException>(
-            () => hashBasedUrlShortener.GenerateAsync(shortUrl, "example.com"));
+            () => hashBasedUrlShortener.GenerateAsync(shortUrl, "example.com", CancellationToken.None));
 #pragma warning restore CS8604 // Possible null reference argument.
     }
 
@@ -162,7 +162,7 @@ public sealed class HashBasedUrlShortenerTests : IDisposable
 
 #pragma warning disable CS8604 // Possible null reference argument.
         _ = await Assert.ThrowsAsync<ArgumentException>(
-            () => hashBasedUrlShortener.GenerateAsync(shortUrl, actualUrl));
+            () => hashBasedUrlShortener.GenerateAsync(shortUrl, actualUrl, CancellationToken.None));
 #pragma warning restore CS8604 // Possible null reference argument.
     }
 

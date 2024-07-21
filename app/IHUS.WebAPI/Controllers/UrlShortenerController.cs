@@ -43,10 +43,13 @@ public class UrlShortenerController : ControllerBase
         try
         {
             var shortenedUrl = request.ShortUrl is null
-                ? await _shortenedUrlGenerator.GenerateAsync(request.ActualUrl, cancellationToken)
+                ? await _shortenedUrlGenerator.GenerateAsync(
+                    request.ActualUrl,
+                    cancellationToken)
                 : await _shortenedUrlGenerator.GenerateAsync(
                     request.ShortUrl,
-                    request.ActualUrl);
+                    request.ActualUrl,
+                    cancellationToken);
 
             return Ok(new CreateShortUrlSuccessResponse(shortenedUrl.UrlKey));
         }
