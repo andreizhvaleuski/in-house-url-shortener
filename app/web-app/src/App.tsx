@@ -1,10 +1,13 @@
-import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import CounterStore from './states/CounterStore'
+import { observer } from 'mobx-react-lite'
+
+const counterStore1 = new CounterStore();
+const counterStore2 = new CounterStore();
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
@@ -18,9 +21,8 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+        <Counter counterStore={counterStore1} />
+        <Counter counterStore={counterStore2} />
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
@@ -31,5 +33,19 @@ function App() {
     </>
   )
 }
+
+const Counter = observer(({ counterStore }: { counterStore: CounterStore }) => {
+
+  return (
+    <div style={{padding: "10px"}}>
+      <button onClick={() => counterStore.increment()}>
+        count is {counterStore.counter}
+      </button>
+      <button onClick={() => counterStore.decrement()}>
+        decrement
+      </button>
+    </div>
+  );
+});
 
 export default App

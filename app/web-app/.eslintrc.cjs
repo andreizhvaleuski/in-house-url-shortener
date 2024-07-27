@@ -8,10 +8,11 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
+    'plugin:mobx/recommended'
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react', 'react-refresh'],
+  plugins: ['react', 'react-refresh', 'mobx'],
   rules: {
     'react-refresh/only-export-components': [
       'warn',
