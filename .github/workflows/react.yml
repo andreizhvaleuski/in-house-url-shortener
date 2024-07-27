@@ -5,7 +5,7 @@ name: Web app CI
 
 defaults:
   run:
-    working-directory: app/web-app
+    working-directory: app\web-app
 
 on:
   push:
