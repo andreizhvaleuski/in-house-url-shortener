@@ -16,7 +16,7 @@ jobs:
     
     defaults:
       run:
-        working-directory: ./app
+        working-directory: ./app/server
 
     env:
       POSTGRES_CONNECTION_STRING: "Server=127.0.0.1;Port=5432;Database=IHUS;User Id=username;Password=postgres;"
