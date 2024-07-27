@@ -7,8 +7,7 @@ import { observer } from 'mobx-react-lite'
 const counterStore1 = new CounterStore();
 const counterStore2 = new CounterStore();
 
-function App() {
-
+const App = observer(() => {
   return (
     <>
       <div>
@@ -32,7 +31,7 @@ function App() {
       </p>
     </>
   )
-}
+})
 
 const Counter = observer(({ counterStore }: { counterStore: CounterStore }) => {
 
